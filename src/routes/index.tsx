@@ -1,22 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Hello World" },
-      { name: "description", content: "A simple hello world page." },
-      { property: "og:title", content: "Hello World" },
-      { property: "og:description", content: "A simple hello world page." },
-    ],
-  }),
-  component: Index,
+  component: IndexRedirect,
 });
 
-function Index() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-      <h1 className="text-2xl font-medium">hello world</h1>
-    </div>
-  );
+function IndexRedirect() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      navigate({ to: data.session ? "/notes" : "/auth", replace: true });
+    });
+  }, [navigate]);
+  return null;
 }
-
